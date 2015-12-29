@@ -6,6 +6,12 @@ DataGenModder is a script that creates a dataset of text files based on input, a
 to a random amount of them based off of a timed interval.  This gives the look of a changing dataset to
 anyone that may be scanning those files. 
 
+#### Script Help
+```
+node DataGenModder.js --help
+```
+Running --help as a parameter will print the script help screen.
+
 #### Parameters
 ```
 [0] - Number of Directories 
