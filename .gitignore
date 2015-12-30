@@ -1,0 +1,14 @@
+
+#Ignores #
+node_modules/
+
+# IDEA ignores
+*.iml
+.idea/
+
+# Other
+doc/
+docs/
+*.DS_Store
+*.out
+*.so

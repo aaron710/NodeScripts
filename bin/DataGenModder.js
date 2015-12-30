@@ -20,7 +20,8 @@
     [3] - Source Folder
     [4] - Number of Seconds Between Changes (0 to skip)
     [5] - Size of Appends      (0 to skip, otherwise 1,4,16,256,512,1024)
-    [6] - Debug                (optional, default 'false')
+    [6] - Size of New Files    (0 to not add any, otherwise 1,4,16,256,512,1024)
+    [7] - Debug                (optional, default 'false')
 
     Example command to run full script:
         node DataGenModder.js 10 10 16 'c:\\source\\test' 4 120
@@ -43,15 +44,18 @@
  */
 
 var fs = require('graceful-fs');
+var shell = require('shelljs');
+
 var args = process.argv.slice(2);
 
 if (args[0] == "--help")
 {
+
     printHelp();
     process.exit();
 }
 
-if (args.length < 5)
+if (args.length < 7)
 {
     console.log("\n");
     console.log("Error: Not enough arguments\n" +
@@ -61,7 +65,8 @@ if (args.length < 5)
         "[3] - Source Folder\n" +
         "[4] - Number of Seconds Between Changes (0 to skip)\n" +
         "[5] - Size of Appends      (0 to skip modification, otherwise 1,4,16,256,512,1024)\n" +
-        "[6] - Debug                (optional, default 'false')");
+        "[6] - Size of New Files    (0 to not add any, otherwise 1,4,16,256,512,1024)\n" +
+        "[7] - Debug                (optional, default 'false')");
 
     process.exit();
 }
@@ -86,12 +91,13 @@ var fileSize = args[2];
 var sourceDir = args[3];
 var tSeconds = args[4];
 var appendSize = args[5];
+var newFileSize = args[6];
 
 // If there is a 6th argument set the debug
-if (args[6] != null)
+if (args[7] != null)
 {
-    console.log(args[6])
-    if (args[6] == "true")
+    console.log(args[7])
+    if (args[7] == "true")
         tDebug = true;
 }
 
@@ -99,7 +105,7 @@ if (numOfDirs != 0 && numFilesPerDir != 0 && fileSize != 0 && sourceDir != "")
     generateData(numOfDirs,numFilesPerDir,fileSize,sourceDir,tDebug);
 
 if (numOfDirs != 0 && numFilesPerDir != 0 && sourceDir != "" &&tSeconds != 0 && appendSize != 0)
-    changeData(tSeconds,numOfDirs,numFilesPerDir,appendSize,sourceDir,tDebug);
+    changeData(tSeconds,numOfDirs,numFilesPerDir,appendSize,sourceDir,tDebug,newFileSize);
 
 //process.exit();
 
@@ -109,6 +115,25 @@ if (numOfDirs != 0 && numFilesPerDir != 0 && sourceDir != "" &&tSeconds != 0 && 
 function randomIntInc(low, high)
 {
     return Math.floor(Math.random() * (high - low + 1) + low);
+}
+
+function countNumOfFilesInFolder(DirectoryName)
+{
+    var count = 0;
+    shell.cd(DirectoryName);
+    var files = shell.ls() || [];
+
+    for (var i=0; i<files.length; i++)
+    {
+        var file = files[i];
+
+        if (file.match(/.*\..*/))
+        {
+            count++;
+        }
+    }
+
+    return count;
 }
 
 function printHelp()
@@ -135,7 +160,8 @@ function printHelp()
                 "[3] - Source Folder\n" +
                 "[4] - Number of Seconds Between Changes (0 to skip)\n" +
                 "[5] - Size of Appends      (0 to skip, otherwise 1,4,16,256,512,1024)\n" +
-                "[6] - Debug                (optional, default 'false')");
+                "[6] - Size of New Files    (0 to not add any, otherwise 1,4,16,256,512,1024)\n" +
+                "[7] - Debug                (optional, default 'false')");
     console.log("\n");
     console.log("Example command to run full script:");
     console.log("node DataGenModder.js 10 10 16 'c:\\source\\test' 4 120");
@@ -190,9 +216,10 @@ function generateData(numOfDirs, numFilesPerDir, fileSize, sourceDir, tDebug)
     console.log("Total Data Generated (KB): " + (numOfDirs*numFilesPerDir*fileSize));
 }
 
-function changeData(tSeconds,numOfDirs,numFilesPerDir,appendSize,sourceDir,tDebug)
+function changeData(tSeconds,numOfDirs,numFilesPerDir,appendSize,sourceDir,tDebug,newFileSize)
 {
     var totalFilesEdited = 0;
+    var totalFilesAdded = 0;
 
     setInterval(function()
     {
@@ -208,20 +235,36 @@ function changeData(tSeconds,numOfDirs,numFilesPerDir,appendSize,sourceDir,tDebu
 
         }
 
+        var newFileData = oneKb;
+        for (var i = 0; i < newFileSize; i++)
+        {
+            if (i == 0)
+                continue;
+            else
+            {
+                newFileData = newFileData.concat(oneKb);
+            }
+        }
+
+
         var numFilesToEdit = randomIntInc(0,numFilesPerDir-1);
         var numDirsToEnter = 0;
         var numFilesChangePerDir = 0;
+        var numFilesToCreate = randomIntInc(0,numFilesPerDir-1);
+        var numFilesCreatePerDir = 0;
 
         // Figure out some basic statistics
         if (numFilesToEdit < 5)
         {
             numDirsToEnter = 1;
             numFilesChangePerDir = numFilesToEdit;
+            numFilesCreatePerDir = numFilesToCreate;
         }
         else
         {
             numDirsToEnter = randomIntInc(1,numOfDirs-1);
             numFilesChangePerDir = Math.floor(numFilesToEdit/numDirsToEnter);
+            numFilesCreatePerDir = Math.floor(numFilesToCreate/numDirsToEnter);
         }
 
         // For each dir to enter
@@ -230,11 +273,14 @@ function changeData(tSeconds,numOfDirs,numFilesPerDir,appendSize,sourceDir,tDebu
             // Generate a random number to choose which folder we enter
             var folderToEdit = randomIntInc(0,numOfDirs-1);
 
+            // Get the current count of files in the folder
+            var count = countNumOfFilesInFolder(sourceDir+'/folder'+folderToEdit);
+
             // For the number of files to change in each directory
             for(var j =0; j < numFilesChangePerDir; j++)
             {
                 // Generate a random number to choose which file we enter
-                var fileToEdit = randomIntInc(0,numFilesPerDir-1);
+                var fileToEdit = randomIntInc(0,count-1);
                 //console.log("file to edit: " + fileToEdit);
 
                 fs.appendFile(sourceDir+'/folder'+folderToEdit+'/file'+ fileToEdit +'.txt', fileData, function (err) {if(err)console.log(err)});
@@ -245,6 +291,26 @@ function changeData(tSeconds,numOfDirs,numFilesPerDir,appendSize,sourceDir,tDebu
                 if(tDebug)console.log("File: " + filename + " has been appended to")
             }
 
+            if (newFileSize != 0)
+            {
+                // For the number of files to change in each directory
+                for(var k = count; k < (count + numFilesCreatePerDir); k++)
+                {
+                    // Generate a random number to choose which file we enter
+                    //var fileToEdit = randomIntInc(count,((count + numFilesPerDir) -1));
+                    //console.log("file to edit: " + fileToEdit);
+
+                    // Create the file
+                    fs.writeFileSync(sourceDir+'/folder'+folderToEdit+'/file'+k+'.txt', newFileData);
+                    totalFilesAdded++;
+                    if(tDebug)console.log("File Created: " + sourceDir+'/folder'+folderToEdit+'/file'+k+'.txt');
+
+                    //totalFilesEdited++;
+                    //var filename = sourceDir+'\\folder'+folderToEdit+'\\file'+fileToEdit+'.txt';
+
+                }
+            }
+
         };
 
         console.log("**************************************************************");
@@ -252,9 +318,11 @@ function changeData(tSeconds,numOfDirs,numFilesPerDir,appendSize,sourceDir,tDebu
         //console.log("Number of dirs to enter: " + numDirsToEnter);
         //console.log("Number of files to edit per dir: " + numFilesChangePerDir);
         console.log("Total Files Edited: " + totalFilesEdited);
-        console.log("Total Data Added (Kb): " + totalFilesEdited*appendSize);
-        console.log("Total Number of Files    : " + (numOfDirs*numFilesPerDir));
-        console.log("Total Data (KB): " + ((numOfDirs*numFilesPerDir*fileSize)+totalFilesEdited*appendSize));
+        console.log("Total Data Updated (Kb): " + totalFilesEdited*appendSize);
+        console.log("Total New Files: " + totalFilesAdded);
+        console.log("Total New Files Data (KB): " + (totalFilesAdded * newFileSize));
+        console.log("Total Number of Files    : " + (numOfDirs*numFilesPerDir + totalFilesAdded));
+        console.log("Total Data (KB): " + ((numOfDirs*numFilesPerDir*fileSize)+ (totalFilesEdited*appendSize) + (totalFilesAdded * newFileSize)));
 
     }, (tSeconds * 1000));
 }
