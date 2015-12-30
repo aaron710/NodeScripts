@@ -9,12 +9,13 @@ anyone that may be scanning those files.
 #### Dependency
 ```
 npm install graceful-fs
+npm install shelljs
 ```
-We have a dependency on graceful fs. So you will need to npm install it before you use the script.
+We have a dependency on graceful-fs and shelljs. So you will need to npm install it before you use the script.
 
 #### Script Help
 ```
-node DataGenModder.js --help
+node bin\DataGenModder.js --help
 ```
 Running --help as a parameter will print the script help screen.
 
@@ -26,18 +27,21 @@ Running --help as a parameter will print the script help screen.
 [3] - Source Folder
 [4] - Number of Seconds Between Changes (0 to skip modification)
 [5] - Size of Appends      				(0 to skip modification, otherwise 1,4,16,256,512,1024)
-[6] - Debug                				(optional, default 'false')
+[6] - Size of New Files    (0 to not add any, otherwise 1,4,16,256,512,1024)
+[7] - Debug                				(optional, default 'false')
 ```
 
 #### To run the scipt:
 ```
-node DataGenModder.js 10 10 16 'c:\source\test' 4 120
-
-This will write 10 directories each with 10 files of size 16kb in the C:\source\test directory 
-and append 4kb of data to random files every 2 minutes.
+node bin\DataGenModder.js 10 10 16 'c:\source\test' 4 120
 ```
+This will write 10 directories each with 10 files of size 16kb in the C:\source\test directory 
+and append 4kb of data to random files every 2 minutes. Running from the root directory will ensure after you
+npm install everything that the dependencies are there.
+
+
 
 - [x] Add ability to create dataset
 - [x] Add ability to append data to random files within the dataset
 - [ ] Add ability to remove data from random files within the dataset
-- [ ] Add ability to add more files during the Modder portion of the script
+- [x] Add ability to add more files during the Modder portion of the script
