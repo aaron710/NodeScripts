@@ -6,6 +6,12 @@ DataGenModder is a script that creates a dataset of text files based on input, a
 to a random amount of them based off of a timed interval.  This gives the look of a changing dataset to
 anyone that may be scanning those files. 
 
+#### Dependency
+```
+npm install graceful-fs
+```
+We have a dependency on graceful fs. So you will need to npm install it before you use the script.
+
 #### Script Help
 ```
 node DataGenModder.js --help
