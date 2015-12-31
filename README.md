@@ -1,7 +1,16 @@
 # NodeScripts
 Some useful nodejs scripts
 
-# DataGenModder
+You can install all of the dependencies at once by doing
+```
+npm install
+```
+or 
+```
+npm run prestart
+```
+
+## DataGenModder
 DataGenModder is a script that creates a dataset of text files based on input, and then appends data
 to a random amount of them based off of a timed interval.  This gives the look of a changing dataset to
 anyone that may be scanning those files. 
@@ -45,3 +54,37 @@ npm install everything that the dependencies are there.
 - [x] Add ability to append data to random files within the dataset
 - [ ] Add ability to remove data from random files within the dataset
 - [x] Add ability to add more files during the Modder portion of the script
+
+## HydraDbReader
+HydraDbReader will access Hydra's Mongo Database and print out usefull information to the screen for the 
+person running the script.
+
+#### Dependency
+```
+npm install mongodb
+npm install async
+npm install colors
+npm install console.table
+npm install readline-sync
+```
+
+
+#### Script Help
+```
+node bin\HydraDbReader.js --help
+```
+Running --help as a parameter will print the script help screen.
+
+#### Parameters
+```
+ [0] -  MongoDb Host IP Address
+ [1] -  MongoDb Host Port
+ [2] -  MongoDb Username ('' for empty)
+ [3] -  MongoDb Password ('' for empty)
+```
+
+#### To run the scipt:
+```
+node bin\HydraDbReader.js localhost 27017 "" ""
+```
+

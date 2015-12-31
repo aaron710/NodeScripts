@@ -8,14 +8,10 @@
 
  Input Parameters:
 
- [0] -
- [1] -
- [2] -
- [3] -
- [4] -
- [5] -
- [6] -
-
+ [0] -  MongoDb Host IP Address
+ [1] -  MongoDb Host Port
+ [2] -  MongoDb Username
+ [3] -  MongoDb Password
  *
  */
 var jobDbConnector = require('./DbReader/JobDbConnector.js');
@@ -25,8 +21,34 @@ var agentDbConnector = require('./DbReader/AgentDbConnector.js');
 var readlineSync = require('readline-sync');
 var async = require('async');
 
-// Wait for user's response.
+// Get the arguments from the program
+var args = process.argv.slice(2);
 
+if (args[0] == "--help")
+{
+
+    printHelp();
+    process.exit();
+}
+
+if (args.length < 4)
+{
+    console.log("\n");
+    console.log("Error: Not enough arguments\n" +
+        "[0] - MongoDb Host IP Address\n" +
+        "[1] - MongoDb Host Port  \n" +
+        "[2] - MongoDb Username ('' for empty)\n" +
+        "[3] - MongoDb Password ('' for empty)\n");
+    process.exit();
+}
+
+
+var mongoUri = "";
+
+if (args[2] == "" || args[3] == "")
+    mongoUri = "mongodb://"+ args[0] + ":" + args[1];
+else
+    mongoUri = "mongodb://" + args[2] + ":" + args[3] + "@" + args[0] + ":" + args[1];
 
 var databaseChoice = 0;
 
@@ -56,7 +78,7 @@ async.whilst
             case "1":
             {
                 // console.log("Connecting to Job Database");
-                jobDbConnector.connectToDb("job", function()
+                jobDbConnector.connectToDb(mongoUri,"job", function()
                 {
                     callback();
                 });
@@ -65,7 +87,7 @@ async.whilst
             }
             case "2":
             {
-                deviceDbConnector.connectToDb("device", function()
+                deviceDbConnector.connectToDb(mongoUri,"device", function()
                 {
                     callback();
                 });
@@ -73,7 +95,7 @@ async.whilst
             }
             case "3":
             {
-                agentDbConnector.connectToDb("agent", function()
+                agentDbConnector.connectToDb(mongoUri,"agent", function()
                 {
                     callback();
                 });
@@ -99,3 +121,18 @@ async.whilst
     }
 );
 
+
+function printHelp()
+{
+    console.log("\n");
+    console.log("HydraDbReader");
+    console.log("Created By: Aaron");
+    console.log("Created On: 12/30/15");
+    console.log("\n");
+    console.log("Used to read the Hydra Database for information on Jobs, Devices, and Agents");
+    console.log("Usage:\n" +
+                    "[0] - MongoDb Host IP Address\n" +
+                    "[1] - MongoDb Host Port  \n" +
+                    "[2] - MongoDb Username\n" +
+                    "[3] - MongoDb Password\n");
+}

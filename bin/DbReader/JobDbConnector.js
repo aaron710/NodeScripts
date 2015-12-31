@@ -11,10 +11,10 @@ var readlineSync = require('readline-sync');
 // Project Required Files
 var jobTasks = require('./tasks/jobTasks.js');
 
-exports.connectToDb = function(dbName,connectToDbCallBack)
+exports.connectToDb = function(mongoUri,dbName,connectToDbCallBack)
 {
     //console.log("connectToDb");
-    var url1 = 'mongodb://192.168.21.132:27017/'+dbName;
+    var url1 = mongoUri + '/'+ dbName;
 
     // Use connect method to connect to the Server
     MongoClient.connect(url1, function(err, db)
