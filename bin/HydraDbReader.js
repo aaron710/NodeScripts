@@ -19,9 +19,8 @@
  *
  */
 var jobDbConnector = require('./DbReader/JobDbConnector.js');
+var deviceDbConnector = require('./DbReader/DeviceDbConnector.js');
 
-var MongoClient = require('mongodb').MongoClient;
-var consoleTable = require('console.table');
 var readlineSync = require('readline-sync');
 var async = require('async');
 
@@ -44,8 +43,8 @@ async.whilst
 
         databaseChoice = readlineSync.question('Which database do you want to connect to: \n' +
             '1 - Jobs\n' +
-            '2 - Agents\n' +
-            '3 - Device\n' +
+            '2 - Device\n' +
+            '3 - Agents\n' +
             '4 - User\n' +
             '5 - Exit\n' +
             '===================================\n' +
@@ -65,6 +64,10 @@ async.whilst
             }
             case "2":
             {
+                deviceDbConnector.connectToDb("device", function()
+                {
+                    callback();
+                });
                 break;
             }
             case "3":

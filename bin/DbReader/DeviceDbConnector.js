@@ -1,5 +1,5 @@
 /**
- * Created by aaron on 12/30/2015.
+ * Created by aaron on 12/31/2015.
  */
 
 // Node Required Libraries
@@ -7,9 +7,8 @@ var MongoClient = require('mongodb').MongoClient;
 var async = require('async');
 var readlineSync = require('readline-sync');
 
-
-// Project Required Files
-var jobTasks = require('./tasks/jobTasks.js');
+// Project Required Tasks
+var deviceTasks = require('./tasks/deviceTasks.js');
 
 exports.connectToDb = function(dbName,connectToDbCallBack)
 {
@@ -29,20 +28,21 @@ exports.connectToDb = function(dbName,connectToDbCallBack)
             {
                 // If the choice is to go to the previous screen we are going to use our callback as well
                 // as disconnect from the job database as a whole
-                if (collectionChoice == 3)
+                if (collectionChoice == 4)
                 {
                     db.close();
                     connectToDbCallBack();
                 }
 
-                return collectionChoice !=3;
+                return collectionChoice !=4;
             },
-            function (callback2)
+            function (callback)
             {
                 collectionChoice = readlineSync.question('Which collection: \n' +
-                    '1 - job\n' +
-                    '2 - job report\n' +
-                    '3 - return to previous\n' +
+                    '1 - Device\n' +
+                    '2 - Shares\n' +
+                    '3 - Exports\n' +
+                    '4 - return to previous\n' +
                     '===================================\n' +
                     'selection: ');
 
@@ -50,25 +50,34 @@ exports.connectToDb = function(dbName,connectToDbCallBack)
                 {
                     case "1":
                     {
-                        runJobTasks(db,function()
+                        runDeviceTasks(db,function()
                         {
-                            callback2(null, collectionChoice);
+                            callback();
                         });
 
                         break;
                     }
                     case "2":
                     {
-                        runJobReportTasks(db,function()
+                        runSharesTasks(db,function()
                         {
-                            callback2(null, collectionChoice);
+                            callback();
+                        });
+
+                        break;
+                    }
+                    case "3":
+                    {
+                        runExportsTasks(db,function()
+                        {
+                            callback();
                         });
 
                         break;
                     }
                     default:
                     {
-                        callback2(null, collectionChoice);
+                        callback();
                         break;
                     }
                 }
@@ -83,68 +92,7 @@ exports.connectToDb = function(dbName,connectToDbCallBack)
  * @param db
  * @param runJobTasksCallback
  */
-function runJobTasks(db,runJobTasksCallback)
-{
-    var taskChoice = 0;
-
-    async.whilst(
-        function ()
-        {
-            if (taskChoice == 4)
-            {
-                runJobTasksCallback();
-            }
-
-            return taskChoice != 4;
-        },
-        function (callback)
-        {
-            taskChoice = readlineSync.question('What would you like to do: \n' +
-                '1 - Get All Jobs\n' +
-                '2 - Get Job By Name\n' +
-                '3 - Get Job By Status\n' +
-                '4 - return to previous\n' +
-                '===================================\n' +
-                'selection: ');
-
-            if (taskChoice == 1)
-            {
-                jobTasks.findAllJobs(db, function ()
-                {
-                    callback(null, taskChoice);
-                });
-            }
-            else if (taskChoice == 2)
-            {
-                jobTasks.findJobByName(db, function ()
-                {
-                    callback(null, taskChoice);
-                });
-
-            }
-            else if (taskChoice == 3)
-            {
-                jobTasks.findJobsStatus(db, function ()
-                {
-                    callback(null, taskChoice);
-                });
-
-            }
-            else
-            {
-                callback(null, taskChoice);
-            }
-
-        }
-    );
-}
-
-/**
- * @description - for the job table allows user to pick their tasks
- * @param db
- * @param runJobTasksCallback
- */
-function runJobReportTasks(db,runJobReportTasksCallback)
+function runDeviceTasks(db,runDeviceTasksCallback)
 {
     var taskChoice = 0;
 
@@ -153,7 +101,7 @@ function runJobReportTasks(db,runJobReportTasksCallback)
         {
             if (taskChoice == 3)
             {
-                runJobReportTasksCallback("done");
+                runDeviceTasksCallback();
             }
 
             return taskChoice != 3;
@@ -161,32 +109,127 @@ function runJobReportTasks(db,runJobReportTasksCallback)
         function (callback)
         {
             taskChoice = readlineSync.question('What would you like to do: \n' +
-                '1 - Get All Job Reports\n' +
-                '2 - Get Reports By Job Id\n' +
+                '1 - Get All Devices\n' +
+                '2 - Get Device By Name\n' +
                 '3 - return to previous\n' +
                 '===================================\n' +
                 'selection: ');
 
             if (taskChoice == 1)
             {
-                jobTasks.findAllJobReports(db, function ()
+                deviceTasks.findAllDevices(db, function ()
                 {
-                    callback(null, taskChoice);
+                    callback();
                 });
             }
             else if (taskChoice == 2)
             {
-                jobTasks.findJobReportsByJobId(db, function ()
+                deviceTasks.findDeviceByName(db, function ()
                 {
-                    callback(null, taskChoice);
+                    callback();
                 });
 
             }
             else
             {
-                callback(null, taskChoice);
+                callback();
             }
 
         }
     );
 }
+
+function runSharesTasks(db,runSharesTasksCallback)
+{
+    var taskChoice = 0;
+
+    async.whilst(
+        function ()
+        {
+            if (taskChoice == 3)
+            {
+                runSharesTasksCallback();
+            }
+
+            return taskChoice != 3;
+        },
+        function (callback)
+        {
+            taskChoice = readlineSync.question('What would you like to do: \n' +
+                '1 - Get All Shares\n' +
+                '2 - Get Shares By Device Id\n' +
+                '3 - return to previous\n' +
+                '===================================\n' +
+                'selection: ');
+
+            if (taskChoice == 1)
+            {
+                deviceTasks.findAllShares(db, function ()
+                {
+                    callback();
+                });
+            }
+            else if (taskChoice == 2)
+            {
+                deviceTasks.findSharesByDeviceId(db, function ()
+                {
+                    callback();
+                });
+
+            }
+            else
+            {
+                callback();
+            }
+
+        }
+    );
+}
+
+function runExportsTasks(db,runExportTasksCallback)
+{
+    var taskChoice = 0;
+
+    async.whilst(
+        function ()
+        {
+            if (taskChoice == 3)
+            {
+                runExportTasksCallback();
+            }
+
+            return taskChoice != 3;
+        },
+        function (callback)
+        {
+            taskChoice = readlineSync.question('What would you like to do: \n' +
+                '1 - Get All Exports\n' +
+                '2 - Get Exports By Device Id\n' +
+                '3 - return to previous\n' +
+                '===================================\n' +
+                'selection: ');
+
+            if (taskChoice == 1)
+            {
+                deviceTasks.findAllExports(db, function ()
+                {
+                    callback();
+                });
+            }
+            else if (taskChoice == 2)
+            {
+                deviceTasks.findExportsByDeviceId(db, function ()
+                {
+                    callback();
+                });
+
+            }
+            else
+            {
+                callback();
+            }
+
+        }
+    );
+}
+
