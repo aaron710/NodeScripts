@@ -20,6 +20,7 @@
  */
 var jobDbConnector = require('./DbReader/JobDbConnector.js');
 var deviceDbConnector = require('./DbReader/DeviceDbConnector.js');
+var agentDbConnector = require('./DbReader/AgentDbConnector.js');
 
 var readlineSync = require('readline-sync');
 var async = require('async');
@@ -33,10 +34,10 @@ async.whilst
 (
     function()
     {
-        if (databaseChoice == 5)
+        if (databaseChoice == 4)
             process.exit();
 
-        return databaseChoice != 5;
+        return databaseChoice != 4;
     },
     function (callback)
     {
@@ -45,8 +46,8 @@ async.whilst
             '1 - Jobs\n' +
             '2 - Device\n' +
             '3 - Agents\n' +
-            '4 - User\n' +
-            '5 - Exit\n' +
+            //'4 - User\n' +
+            '4 - Exit\n' +
             '===================================\n' +
             'selection: ');
 
@@ -72,13 +73,17 @@ async.whilst
             }
             case "3":
             {
+                agentDbConnector.connectToDb("agent", function()
+                {
+                    callback();
+                });
                 break;
             }
+            //case "4":
+            //{
+            //    break;
+            //}
             case "4":
-            {
-                break;
-            }
-            case "5":
             {
                 console.log("Exiting program");
                 callback();
