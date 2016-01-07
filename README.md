@@ -42,7 +42,7 @@ Running --help as a parameter will print the script help screen.
 
 #### To run the scipt:
 ```
-node bin\DataGenModder.js 10 10 16 'c:\source\test' 120 4 4
+node bin\DataGenModder.js 10 10 16 c:\source\test 120 4 4
 ```
 This will write 10 directories each with 10 files of size 16kb in the C:\source\test directory 
 and append 4kb of data to random files every 2 minutes. Running from the root directory will ensure after you
