@@ -36,19 +36,19 @@ Running --help as a parameter will print the script help screen.
 [3] - Source Folder
 [4] - Number of Seconds Between Changes (0 to skip modification)
 [5] - Size of Appends      				(0 to skip modification, otherwise 1,4,16,256,512,1024)
-[6] - Size of New Files    (0 to not add any, otherwise 1,4,16,256,512,1024)
+[6] - Size of New Files        (0 to not add any, otherwise 1,4,16,256,512,1024)
 [7] - Debug                				(optional, default 'false')
 ```
 
 #### To run the scipt:
 ```
-node bin\DataGenModder.js 10 10 16 'c:\source\test' 4 120 4
+node bin\DataGenModder.js 10 10 16 'c:\source\test' 120 4 4
 ```
 This will write 10 directories each with 10 files of size 16kb in the C:\source\test directory 
 and append 4kb of data to random files every 2 minutes. Running from the root directory will ensure after you
 npm install everything that the dependencies are there.
 
-
+Note: This script does not create 0 byte files at all. Entering a 0 will typically skip the step or as the descriptions describe not add any.
 
 - [x] Add ability to create dataset
 - [x] Add ability to append data to random files within the dataset
