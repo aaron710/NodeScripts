@@ -88,3 +88,33 @@ Running --help as a parameter will print the script help screen.
 node bin\HydraDbReader.js localhost 27017 "" ""
 ```
 
+## International Char File Generator
+InternationalCharFileGen will create files with unique characters in their names
+
+#### Dependency
+```
+npm install graceful-fs
+```
+
+
+#### Script Help
+```
+node bin\InternationalCharFileGen.js --help
+```
+Running --help as a parameter will print the script help screen.
+
+#### Parameters
+```
+ [0] -  folder to write files to
+ [1] -  Language Number selected from the following
+            0 - German
+            1 - Spanish
+            2 - Sweedish
+            3 - All
+
+```
+
+#### To run the scipt:
+```
+node bin\InternationalCharFileGen.js b:\src 3
+```
